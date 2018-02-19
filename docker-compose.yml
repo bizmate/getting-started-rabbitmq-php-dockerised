@@ -1,0 +1,71 @@
+version: '2.2'
+
+services:
+  nginx:
+    build:
+      context: .
+      dockerfile: docker/nginx/DockerFile
+    ports:
+      - "8888:80"
+    volumes:
+      - ./docker/config/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./src:/var/www/html/:z
+    depends_on:
+      - php_sender
+
+  php_sender:
+    build:
+      context: .
+      dockerfile: docker/php/DockerFile
+    user: $UID
+    ports:
+      - "9000"
+    volumes:
+      - ./docker/config/php.ini:/usr/local/etc/php/php.ini
+#      - /etc/group:/etc/group:ro
+#      - /etc/passwd:/etc/passwd
+      - ./src:/var/www/html/:z
+#    volumes_from:
+#     - data
+    depends_on:
+      - php_receiver
+      - composer
+
+  php_receiver:
+    #image: phpdockerio/php71-cli
+    build:
+      context: .
+      dockerfile: docker/php_receiver/DockerFile
+    command: "php /app/receive.php"
+    volumes:
+      - ./src:/app
+    depends_on:
+      composer:
+        condition: service_started
+      rabbitmq:
+        condition: service_healthy
+    links:
+      - rabbitmq
+    scale: 5
+
+#https://stackoverflow.com/questions/31746182/docker-compose-wait-for-container-x-before-starting-y
+  rabbitmq:
+#    image: rabbitmq
+    build:
+      context: .
+      dockerfile: docker/rabbitmq/DockerFile
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:15672"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  composer:
+    image: composer
+    user: $UID
+    volumes:
+      - ./src:/app
+    command: composer install --ignore-platform-reqs
