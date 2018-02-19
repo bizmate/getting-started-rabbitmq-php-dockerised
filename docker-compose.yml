@@ -62,6 +62,9 @@ services:
       interval: 30s
       timeout: 10s
       retries: 5
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+
 
   composer:
     image: composer
@@ -69,3 +72,6 @@ services:
     volumes:
       - ./src:/app
     command: composer install --ignore-platform-reqs
+
+volumes:
+  rabbitmq-data:
