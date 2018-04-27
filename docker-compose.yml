@@ -4,7 +4,7 @@ services:
   nginx:
     build:
       context: .
-      dockerfile: docker/nginx/DockerFile
+      dockerfile: docker/nginx/Dockerfile
     ports:
       - "8888:80"
     volumes:
@@ -35,7 +35,7 @@ services:
     #image: phpdockerio/php71-cli
     build:
       context: .
-      dockerfile: docker/php_receiver/DockerFile
+      dockerfile: docker/php_receiver/Dockerfile
     command: "php /app/receive.php"
     volumes:
       - ./src:/app
@@ -53,7 +53,7 @@ services:
 #    image: rabbitmq
     build:
       context: .
-      dockerfile: docker/rabbitmq/DockerFile
+      dockerfile: docker/rabbitmq/Dockerfile
     ports:
       - "15672:15672"
       - "5672:5672"
