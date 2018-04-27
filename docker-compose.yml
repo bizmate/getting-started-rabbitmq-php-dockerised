@@ -16,17 +16,13 @@ services:
   php_sender:
     build:
       context: .
-      dockerfile: docker/php/DockerFile
+      dockerfile: docker/php/Dockerfile
     user: $UID
     ports:
       - "9000"
     volumes:
       - ./docker/config/php.ini:/usr/local/etc/php/php.ini
-#      - /etc/group:/etc/group:ro
-#      - /etc/passwd:/etc/passwd
       - ./src:/var/www/html/:z
-#    volumes_from:
-#     - data
     depends_on:
       - php_receiver
       - composer
@@ -64,7 +60,6 @@ services:
       retries: 5
     volumes:
       - rabbitmq-data:/var/lib/rabbitmq
-
 
   composer:
     image: composer
