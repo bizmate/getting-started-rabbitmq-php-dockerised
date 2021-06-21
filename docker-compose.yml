@@ -62,11 +62,14 @@ services:
       - rabbitmq-data:/var/lib/rabbitmq
 
   composer:
-    image: composer
+    build: docker/composer
     user: $UID
     volumes:
       - ./src:/app
-    command: composer install --ignore-platform-reqs
+    command: composer install
+    environment:
+      - HOME=/home/composer
+    working_dir: /app
 
 volumes:
   rabbitmq-data:
